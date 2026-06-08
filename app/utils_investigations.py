@@ -18,6 +18,7 @@ class Investigation:
     is_entry_point: bool
 
     analyst_days: float
+    icon: str = "map-pin"
 
 
 DEMAND = Investigation(
@@ -268,3 +269,26 @@ PROJECTED_DEMAND = Investigation(
     analyst_prompt="Show me how the 50-85 population is projected to change across Devon in the next 10 years.",
     analyst_days=2,
 )
+
+# At the bottom of investigations.py
+
+ALL_INVESTIGATIONS: dict[str, Investigation] = {
+    inv.id: inv
+    for inv in [
+        DEMAND,
+        DEPRIVATION,
+        TRAVEL_CAR,
+        TRAVEL_PT,
+        HOTSPOTS_DEMAND,
+        HOTSPOTS_DEPRIVATION,
+        HOTSPOTS_DEMAND_DEPRIVATION,
+        HOTSPOTS_DEMAND_TRAVEL,
+        HOTSPOTS_DEPRIVATION_TRAVEL,
+        ISOCHRONES_CAR,
+        ISOCHRONES_PT,
+        TWO_SFCA_CAR,
+        TWO_SFCA_PT,
+        UTILISATION,
+        PROJECTED_DEMAND,
+    ]
+}

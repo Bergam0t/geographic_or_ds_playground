@@ -1,7 +1,8 @@
 import streamlit as st
 import geopandas
 from streamlit_folium import st_folium
-from app.utils import create_demand_gdf
+from app.utils import create_demand_gdf, render_navigation
+from app.utils_investigations import DEMAND
 
 st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
 
@@ -37,3 +38,5 @@ def render_demand_map():
 
 
 render_demand_map()
+
+render_navigation(DEMAND)

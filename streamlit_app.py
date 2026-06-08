@@ -15,8 +15,11 @@ for state in states:
     if state not in st.session_state:
         st.session_state[state] = False
 
-if "nav_history" not in st.session_state:
-    st.session_state.nav_history = []
+if "pages_visited" not in st.session_state:
+    st.session_state.pages_visited = []
+
+if "homepage_visited" not in st.session_state:
+    st.session_state.homepage_visited = False
 
 # Add in a state ensuring they see at least one DEMAND-related page before unlocking
 # the 'make a recommendation' button
@@ -33,6 +36,10 @@ pg = st.navigation(
         st.Page("app/Homepage.py", title="Welcome!", icon=":material/add_circle:"),
         st.Page("app/Demand.py", title="Where is our demand?"),
         st.Page("app/Deprivation.py", title="Where is there high need?"),
+        st.Page("app/Demand_Hotspots.py", title="Where is demand concentrated?"),
+        st.Page(
+            "app/Deprivation_Hotspots.py", title="Where is deprivation concentrated?"
+        ),
         st.Page("app/Demand_Deprivation_Hotspots.py", title="How do these interact?"),
         # Transport pages without cross-border travel to nearest CDCs
         st.Page("app/Travel_Car.py", title="What does travel by car look like now?"),
@@ -40,32 +47,25 @@ pg = st.navigation(
             "app/Travel_Public_Transport.py",
             title="What does travel by public transport look like now?",
         ),
-        # Can get to this one by first doing car
-        st.Page(
-            "app/Travel_Car_Advanced.py", title="What does travel by car look like now?"
-        ),
-        # Can get to this one by first doing public transport
-        st.Page(
-            "app/Travel_Public_Transport_Advanced.py",
-            title="What does travel by public transport look like now if we include cross-border travel?",
-        ),
-        # Can only do this one if both car and public transport previously chosen but are now
-        # wanting to add cross-border CDCs
-        st.Page(
-            "app/Travel_Both_Advanced.py",
-            title="What does travel by car and public transport look like now  if we include cross-border travel?",
-        ),
         # Isochrones as a visual way of exploring travel time
-        # NOTE: do we need separate car and public transport again? Do the different options open up
-        # depending on what they've chosen in terms of general travel time choropleths previously?
-        # Or do these isochrones need their own variant pages?
         st.Page(
-            "app/Catchment_Isochrones.py", title="Who is currently underserved?"
-        ),  # 2 step floating catchment area - again, what to do about car vs PT, and cross-border?
-        st.Page("app/Catchment_2sfca.py", title="Who is currently underserved?"),
+            "app/Catchment_Isochrones_car.py",
+            title="Where are the transport gaps by car?",
+        ),
+        st.Page(
+            "app/Catchment_Isochrones_pt.py",
+            title="Where are the transport gaps by public tranport?",
+        ),
+        # 2 step floating catchment area - again, what to do about car vs PT, and cross-border?
+        st.Page("app/Catchment_2sfca_car.py", title="Who is currently underserved?"),
+        # 2 step floating catchment area - again, what to do about car vs PT, and cross-border?
+        st.Page("app/Catchment_2sfca_pt.py", title="Who is currently underserved?"),
         # This page will have a summary of all of the information they have uniquely collected.
         # Buttons will lead out to 'Collect More Evidence' or
         st.Page("app/Running_Evidence_Summary.py", title="What do we know so far?"),
+        # This page will also have a summary of all of the information they have uniquely collected.
+        st.Page("app/Utilisation.py", title="What's your Decision?"),
+        st.Page("app/Projected_Demand.py", title="What's your Decision?"),
         # This page will also have a summary of all of the information they have uniquely collected.
         st.Page("app/Decide.py", title="What's your Decision?"),
         # Next, we go to the optimization page.

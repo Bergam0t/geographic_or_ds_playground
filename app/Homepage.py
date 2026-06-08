@@ -1,6 +1,7 @@
 import time
 import streamlit as st
-from app.utils import write_terminal_html, record_page_visited
+from app.utils import write_terminal_html, investigation_button
+from app.utils_investigations import DEMAND, TRAVEL_CAR, DEPRIVATION
 
 st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
 
@@ -24,7 +25,7 @@ intro_text = """
 <br><br>
 > People may only use CDCs within Devon. They cannot cross the Devon border to access a different CDC.
 <br><br>
-> You have been assigned a junior analyst who can provide information, but you must decide what evidence to review and can only send one request at a time.
+> You have been assigned a junior analyst who can provide information, but can only follow specific instructions.
 <br><br>
 > Due to capacity constraints, your analyst can provide you with a maximum of four briefings on areas of your choosing.
 <br><br>
@@ -48,31 +49,13 @@ st.iframe("app/assets/terminal_working/homepage.html")
 typing_duration = (char_count * reveal_speed) / 1000
 time.sleep(typing_duration)
 
-record_page_visited("app/Homepage.py")
-
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    if st.button(
-        "'Can you give me a map of travel times to existing CDCs?'",
-        use_container_width=True,
-    ):
-        st.session_state.nav_history.append("Travel Times Map")
-        st.switch_page("app/Travel_Car.py")
+    investigation_button(DEMAND)
 
 with col2:
-    if st.button(
-        "'Can you show me a map of deprivation across Devon?'", use_container_width=True
-    ):
-        st.session_state.nav_history.append("Deprivation Map")
-        st.switch_page("app/Deprivation.py")
+    investigation_button(DEPRIVATION)
 
 with col3:
-    if st.button(
-        "'Can you give me a map of demand across Devon in the 50-85 age range?'",
-        use_container_width=True,
-    ):
-        st.session_state.nav_history.append("Demand Map")
-        st.switch_page("app/Demand.py")
-
-st.caption("More briefing options will be unlocked as you uncover additional evidence.")
+    investigation_button(TRAVEL_CAR)
