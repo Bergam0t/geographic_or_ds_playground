@@ -3,7 +3,7 @@ name = "geographic-or-ds-playground"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.13,<3.14"
 dependencies = [
     "lokigi>=0.1.0",
     "streamlit>=1.58.0",
@@ -12,5 +12,6 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "deepnote-toolkit[server]>=2.3.1",
     "openpyxl>=3.1.5",
 ]
