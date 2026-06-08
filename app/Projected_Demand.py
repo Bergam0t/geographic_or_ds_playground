@@ -1,4 +1,6 @@
+import time
 import streamlit as st
+from app.utils import write_terminal_html, record_page_visited
 
 st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
 
@@ -13,4 +15,4 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.title("2 Step Floating Catchment Areas")
+st.title("Projected Demand")

@@ -1,15 +1,20 @@
 import streamlit as st
 import geopandas
 from streamlit_folium import st_folium
-from app.utils import (
-    load_devon_geography,
-    load_deprivation,
-    write_terminal_html,
-    TERMINAL_COLOUR,
-    TERMINAL_DEFAULT_SPEED,
-)
+from app.utils import load_devon_geography, load_deprivation, write_terminal_html
 
-st.set_page_config(layout="wide")
+st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
+
+st.markdown(
+    """
+<style>
+    [data-testid="collapsedControl"] {
+        display: none
+    }
+</style>
+""",
+    unsafe_allow_html=True,
+)
 
 st.title("Deprivation")
 

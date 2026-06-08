@@ -1,10 +1,21 @@
 import time
 import streamlit as st
-from app.utils import write_terminal_html
+from app.utils import write_terminal_html, record_page_visited
+
+st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
+
+st.markdown(
+    """
+<style>
+    [data-testid="collapsedControl"] {
+        display: none
+    }
+</style>
+""",
+    unsafe_allow_html=True,
+)
 
 st.title("Welcome")
-
-st.set_page_config(layout="wide", initial_sidebar_state="collapsed")
 
 intro_text = """
 > You are a senior manager who has been given funding for an additional community diagnostic centre (CDC) in Devon.
@@ -35,7 +46,7 @@ st.iframe("app/assets/terminal_working/homepage.html")
 typing_duration = (char_count * reveal_speed) / 1000
 time.sleep(typing_duration)
 
-st.session_state.homepage_visited = True
+record_page_visited("app/Homepage.py")
 
 col1, col2, col3 = st.columns(3)
 
@@ -44,17 +55,22 @@ with col1:
         "'Can you give me a map of travel times to existing CDCs?'",
         use_container_width=True,
     ):
-        st.switch_page("app/Travel.py")
+        st.session_state.nav_history.append("Travel Times Map")
+        st.switch_page("app/Travel_Car.py")
+
 with col2:
     if st.button(
         "'Can you show me a map of deprivation across Devon?'", use_container_width=True
     ):
+        st.session_state.nav_history.append("Deprivation Map")
         st.switch_page("app/Deprivation.py")
+
 with col3:
     if st.button(
         "'Can you give me a map of demand across Devon in the 50-85 age range?'",
         use_container_width=True,
     ):
+        st.session_state.nav_history.append("Demand Map")
         st.switch_page("app/Demand.py")
 
 st.caption("More briefing options will be unlocked as you uncover additional evidence.")

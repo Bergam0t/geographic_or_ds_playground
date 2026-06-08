@@ -37,7 +37,15 @@ def load_deprivation():
 
 @st.cache_data
 def load_demand():
-    return pd.read_csv("data/demand_F_50_70.csv")
+    return pd.read_csv("data/demand_MF_50_84.csv")
+
+
+@st.cache_data
+def create_demand_gdf():
+    devon_gdf = load_devon_geography()
+    demand_df = load_demand()
+    full_gdf = devon_gdf.merge(demand_df, left_on="LSOA21NM", right_on="LSOA 2021 Name")
+    return full_gdf
 
 
 def write_terminal_html(
@@ -85,3 +93,8 @@ def write_terminal_html(
         f.write(html_content)
 
     return len(text), reveal_speed_ms
+
+
+def record_page_visited(page_name):
+    step = len(st.session_state.pages_visited + 1)
+    st.session_state.pages_visited.append({"step": step, "page": page_name})
