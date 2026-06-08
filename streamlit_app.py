@@ -1,5 +1,11 @@
 import streamlit as st
 
+states = ["homepage_visited"]
+
+for state in states:
+    if state not in st.session_state:
+        st.session_state[state] = False
+
 pg = st.navigation(
     [
         st.Page("app/Homepage.py", title="Welcome!", icon=":material/add_circle:"),

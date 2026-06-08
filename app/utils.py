@@ -78,3 +78,5 @@ def write_terminal_html(
 
     with open(output_path, "w") as f:
         f.write(html_content)
+
+    return len(text), reveal_speed_ms

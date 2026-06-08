@@ -1,6 +1,3 @@
-/* Initially based on https://codepen.io/tjezidzic/pen/LLWoLw */
-/* Modified by Claude Sonnet 4.6 */
-
 function makeCursor() {
   if (CURSOR === "block") {
     return "<span class='blinker blinker-block'></span>";
@@ -20,6 +17,7 @@ for (var j = 0; j < allElements.length; j++) {
       var text = devTypeText.slice(0, ++i);
       if (text === devTypeText) {
         element.innerHTML = text + (STAY_BLINKING ? makeCursor() : "");
+        window.parent.postMessage({ type: "terminalDone" }, "*");
         return;
       }
       element.innerHTML = text + makeCursor();
