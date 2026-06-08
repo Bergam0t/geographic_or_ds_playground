@@ -1,3 +1,6 @@
+/* Initially based on https://codepen.io/tjezidzic/pen/LLWoLw */
+/* Modified by Claude Sonnet 4.6 */
+
 function makeCursor() {
   if (CURSOR === "block") {
     return "<span class='blinker blinker-block'></span>";
@@ -12,6 +15,13 @@ var allElements = document.getElementsByClassName("typeing");
 for (var j = 0; j < allElements.length; j++) {
   (function(element) {
     var devTypeText = element.getAttribute("data-text") || "";
+
+    if (REVEAL_SPEED_MS === 0) {
+      element.innerHTML = devTypeText + (STAY_BLINKING ? makeCursor() : "");
+      window.parent.postMessage({ type: "terminalDone" }, "*");
+      return;
+    }
+
     var i = 0, isTag;
     (function type() {
       var text = devTypeText.slice(0, ++i);
