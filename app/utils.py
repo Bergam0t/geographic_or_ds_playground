@@ -2,9 +2,14 @@ import pandas as pd
 import streamlit as st
 import geopandas
 import html
+
+TERMINAL_DEFAULT_SPEED = 30
+TERMINAL_COLOUR = "yellow"
+DECISION_COST = 25
+ANALYST_CAPACITY_INITIAL = 100
+
+
 # Load datasets
-
-
 @st.cache_data
 def load_travel_matrix_car():
     return pd.read_csv("data/devon_miu_travel_matrix.csv")
@@ -38,9 +43,9 @@ def load_demand():
 def write_terminal_html(
     text: str,
     output_path: str = "app/assets/terminal.html",
-    colour: str = "yellow",
+    colour: str = TERMINAL_COLOUR,
     glow_amount: float = 0.7,
-    reveal_speed_ms: int = 60,
+    reveal_speed_ms: int = TERMINAL_DEFAULT_SPEED,
     cursor: str = "block",
     stay_blinking: bool = True,
 ):
