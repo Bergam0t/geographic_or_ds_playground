@@ -22,6 +22,8 @@ intro_text = """
 <br><br>
 > You have been told to improve access for those between 50 and 85.
 <br><br>
+> People may only use CDCs within Devon. They cannot cross the Devon border to access a different CDC.
+<br><br>
 > You have been assigned a junior analyst who can provide information, but you must decide what evidence to review and can only send one request at a time.
 <br><br>
 > Due to capacity constraints, your analyst can provide you with a maximum of four briefings on areas of your choosing.
