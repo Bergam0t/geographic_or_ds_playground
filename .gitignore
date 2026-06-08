@@ -1,0 +1,17 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+
+data/Lower_layer_Super_Output_Areas_December_2021_Boundaries_EW_BSC_V4_6453788336260919790.gpkg
+data/File_1_IoD2025_Index_of_Multiple_Deprivation.xlsx
+data/sapelsoasyoa20222024.xlsx
+
+app/assets/terminal_working/*.html
