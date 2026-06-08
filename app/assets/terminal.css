@@ -1,0 +1,55 @@
+/* Initially based on https://codepen.io/tjezidzic/pen/LLWoLw */
+/* Modified by Claude Sonnet 4.6 */
+
+
+body {
+  background: #000000;
+  margin: 0;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.typeing {
+  color: var(--terminal-colour);
+  font-family: monospace;
+  font-size: 1rem;
+  line-height: 1.6;
+  filter:
+    drop-shadow(0 0 4px var(--terminal-glow-strong))
+    drop-shadow(0 0 10px var(--terminal-glow-soft));
+}
+
+span {
+  color: var(--terminal-colour);
+  font-family: monospace;
+}
+
+.blinker {
+  animation: blinker 0.9s steps(2, start) infinite;
+}
+
+.blinker-block {
+  display: inline-block;
+  width: 0.6em;
+  height: 1em;
+  background: var(--terminal-colour);
+  margin-left: 1px;
+  vertical-align: text-bottom;
+}
+
+.blinker-underline {
+  display: inline-block;
+  width: 0.6em;
+  height: 0;
+  border-bottom: 2px solid var(--terminal-colour);
+  margin-left: 1px;
+  vertical-align: baseline;
+}
+
+.blinker-char {
+  color: var(--terminal-colour);
+}
+
+@keyframes blinker {
+  to { visibility: hidden; }
+}

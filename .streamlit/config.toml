@@ -1,0 +1,7 @@
+[theme]
+base="dark"
+backgroundColor="black"
+font = "monospace"
+
+[theme.sidebar]
+font = "monospace"
