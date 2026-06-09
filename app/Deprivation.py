@@ -1,9 +1,8 @@
 import streamlit as st
-import geopandas
-from streamlit_folium import st_folium
-from app.utils import load_devon_geography, load_deprivation, write_terminal_html
+from app.utils import write_terminal_html
 from app.utils import render_navigation
 from app.utils_investigations import DEPRIVATION
+from app.maps import render_deprivation_map
 
 st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
 
@@ -21,11 +20,16 @@ st.markdown(
 st.title("Deprivation")
 
 intro_text = """
-    It has been found that women in more deprived areas have lower breast cancer incidence but significantly higher mortality rates.
     <br><br>
-    You find that screening uptake is poorer among those in more deprived areas.
+
+    You know that it has been found that women in more deprived areas have
+        <br>- lower breast cancer incidence.
+        <br>- significantly higher mortality rates.
+        <br>- poorer screening uptake.
+
     <br><br>
-    You want to ensure that you are considering deprivation in your findings, so you ask your HSMA to bring the deprivation data in too.
+
+    You ask your analyst to show deprivation and they deliver following map, but do not offer any interpretation.
     """
 
 if not st.session_state.deprivation_page_visited:
@@ -42,30 +46,18 @@ else:
 
 st.iframe("app/assets/terminal_working/deprivation_page.html")
 
-
-@st.cache_data
-def create_deprivation_gdf():
-    devon_gdf = load_devon_geography()
-    deprivation_df = load_deprivation()
-    full_gdf = devon_gdf.merge(
-        deprivation_df, left_on="LSOA21NM", right_on="LSOA name (2021)"
-    )
-    return full_gdf
-
-
-deprivation_gdf = create_deprivation_gdf()
-
-
-@st.fragment
-def render_deprivation_map():
-    st_folium(
-        deprivation_gdf.explore(
-            column="Index of Multiple Deprivation (IMD) Decile (where 1 is most deprived 10% of LSOA"
-        ),
-        use_container_width=True,
-    )
-
-
 render_deprivation_map()
+
+
+st.subheader("Interpretation")
+st.radio("Based on this map alone, where would you place the new centre?")
+
+st.radio("What is your most important takeaway from this map?")
+
+
+st.subheader("Write down any additional thoughts you have.")
+st.caption("These will be saved to your notes.")
+st.text_area(label="Your Thoughts", label_visibility="hidden")
+
 
 render_navigation(DEPRIVATION)

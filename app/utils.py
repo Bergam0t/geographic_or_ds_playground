@@ -23,7 +23,17 @@ def load_travel_matrix_public():
 
 @st.cache_data
 def load_devon_sites():
-    return geopandas.read_file("data/devon_mius.geojson")
+    existing_cdcs = pd.read_csv("data/devon_cdcs.csv")
+    return geopandas.GeoDataFrame(
+        existing_cdcs,  # Our pandas dataframe
+        geometry=geopandas.points_from_xy(
+            existing_cdcs[
+                "Longitude"
+            ],  # Our 'x' column (horizontal position of points)
+            existing_cdcs["Latitude"],  # Our 'y' column (vertical position of points)
+        ),
+        crs="EPSG:4326",
+    )
 
 
 @st.cache_data
@@ -46,6 +56,16 @@ def create_demand_gdf():
     devon_gdf = load_devon_geography()
     demand_df = load_demand()
     full_gdf = devon_gdf.merge(demand_df, left_on="LSOA21NM", right_on="LSOA 2021 Name")
+    return full_gdf
+
+
+@st.cache_data
+def create_deprivation_gdf():
+    devon_gdf = load_devon_geography()
+    deprivation_df = load_deprivation()
+    full_gdf = devon_gdf.merge(
+        deprivation_df, left_on="LSOA21NM", right_on="LSOA name (2021)"
+    )
     return full_gdf
 
 
