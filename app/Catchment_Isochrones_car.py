@@ -1,4 +1,7 @@
 import streamlit as st
+from app.utils import render_navigation
+from app.utils_investigations import ISOCHRONES_CAR
+
 
 st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
 
@@ -14,3 +17,5 @@ st.markdown(
 )
 
 st.title("Isochrones")
+
+render_navigation(ISOCHRONES_CAR)

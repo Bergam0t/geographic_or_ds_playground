@@ -40,12 +40,23 @@ pg = st.navigation(
         st.Page(
             "app/Deprivation_Hotspots.py", title="Where is deprivation concentrated?"
         ),
-        st.Page("app/Demand_Deprivation_Hotspots.py", title="How do these interact?"),
+        st.Page(
+            "app/Demand_Deprivation_Hotspots.py",
+            title="Where do areas of both high demand and high deprivation occur?",
+        ),
         # Transport pages without cross-border travel to nearest CDCs
         st.Page("app/Travel_Car.py", title="What does travel by car look like now?"),
         st.Page(
             "app/Travel_Public_Transport.py",
             title="What does travel by public transport look like now?",
+        ),
+        st.Page(
+            "app/Deprivation_Travel_Hotspots.py",
+            title="Where do high deprivation and high travel times intersect?",
+        ),
+        st.Page(
+            "app/Demand_Travel_Hotspots.py",
+            title="Where do high demand and high travel times intersect?",
         ),
         # Isochrones as a visual way of exploring travel time
         st.Page(
@@ -63,9 +74,11 @@ pg = st.navigation(
         # This page will have a summary of all of the information they have uniquely collected.
         # Buttons will lead out to 'Collect More Evidence' or
         st.Page("app/Running_Evidence_Summary.py", title="What do we know so far?"),
-        # This page will also have a summary of all of the information they have uniquely collected.
+        # Explore the utilisation of existing CDCs (capacity vs catchment)
         st.Page("app/Utilisation.py", title="What's your Decision?"),
+        # Display projected demand
         st.Page("app/Projected_Demand.py", title="What's your Decision?"),
+        # NOTE - DO WE NEED PROJECTED UTILISATION TOO?
         # This page will also have a summary of all of the information they have uniquely collected.
         st.Page("app/Decide.py", title="What's your Decision?"),
         # Next, we go to the optimization page.

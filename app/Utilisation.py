@@ -1,6 +1,7 @@
 import time
 import streamlit as st
-from app.utils import write_terminal_html, record_page_visited
+from app.utils import render_navigation, write_terminal_html
+from app.utils_investigations import UTILISATION
 
 st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
 
@@ -16,3 +17,5 @@ st.markdown(
 )
 
 st.title("Current CDC Utilisation")
+
+render_navigation(UTILISATION)
