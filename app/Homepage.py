@@ -1,9 +1,18 @@
 import time
 import streamlit as st
-from app.utils import write_terminal_html, investigation_button
+from app.utils import (
+    write_terminal_html,
+    investigation_button,
+    MAXIMUM_BRIEFINGS,
+    write_crt_html,
+    page_styling,
+    TERMINAL_DEFAULT_SPEED,
+)
 from app.utils_investigations import DEMAND, TRAVEL_CAR, DEPRIVATION
+from num2words import num2words
 
 st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
+page_styling()
 
 st.markdown(
     """
@@ -18,36 +27,57 @@ st.markdown(
 
 st.title("Welcome")
 
-intro_text = """
+cola, colb = st.columns([0.7, 0.3])
+
+intro_text = f"""
 > You are a senior manager who has been given funding for an additional community diagnostic centre (CDC) in Devon.
 <br><br>
 > You have been told to improve access for those between 50 and 85.
 <br><br>
 > People may only use CDCs within Devon. They cannot cross the Devon border to access a different CDC.
 <br><br>
-> You have been assigned a junior analyst who can provide information, but can only follow specific instructions.
+> You have been assigned a rather junior analyst who can provide information, but can only follow very specific instructions.
 <br><br>
-> Due to capacity constraints, your analyst can provide you with a maximum of four briefings on areas of your choosing.
+> Due to capacity constraints, your analyst can provide you with a maximum of {num2words(MAXIMUM_BRIEFINGS)} briefings on areas of your choosing.
+<br><br>
+> The frazzled-looking data team lead has assured you it will be plenty.
 <br><br>
 > What would you like your first briefing to be on?
 """
 
 if not st.session_state.homepage_visited:
+    reveal_speed = TERMINAL_DEFAULT_SPEED
+
     char_count, reveal_speed = write_terminal_html(
         intro_text,
         output_path="app/assets/terminal_working/homepage.html",
+        reveal_speed_ms=reveal_speed,
     )
+
 else:
+    reveal_speed = 0
     char_count, reveal_speed = write_terminal_html(
         intro_text,
         output_path="app/assets/terminal_working/homepage.html",
-        reveal_speed_ms=0,
+        reveal_speed_ms=reveal_speed,
     )
 
-st.iframe("app/assets/terminal_working/homepage.html")
 
-typing_duration = (char_count * reveal_speed) / 1000
-time.sleep(typing_duration)
+with cola:
+    st.iframe("app/assets/terminal_working/homepage.html")
+
+with colb:
+    generated_crt = write_crt_html(
+        image_path="app/assets/homepage.jpeg",
+        output_path="app/assets/crt_working/homepage.html",
+        curvature=0.5,
+        scanlines=0.6,
+    )
+    st.iframe(generated_crt)
+
+if reveal_speed != 0:
+    typing_duration = (char_count * reveal_speed) / 1000
+    time.sleep(typing_duration)
 
 col1, col2, col3 = st.columns(3)
 

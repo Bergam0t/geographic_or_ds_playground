@@ -33,7 +33,7 @@ if "observed_one_accessibility_page" not in st.session_state:
 
 pg = st.navigation(
     [
-        st.Page("app/Homepage.py", title="Welcome!", icon=":material/add_circle:"),
+        st.Page("app/Homepage.py", title="Welcome!"),
         st.Page("app/Demand.py", title="Where is our demand?"),
         st.Page("app/Deprivation.py", title="Where is there high need?"),
         st.Page("app/Demand_Hotspots.py", title="Where is demand concentrated?"),

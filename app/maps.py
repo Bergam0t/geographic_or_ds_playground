@@ -136,13 +136,17 @@ def render_demand_map():
     demand_gdf = create_demand_gdf()
     sites_gdf = load_devon_sites()
 
+    raw_options = ["MF50-84", "Total"]
+
+    alias_dict = {
+        "MF50-84": "Per-LSOA Population - Between 50 and 84",
+        "Total": "Total Per-LSOA Population",
+    }
+
     selected_age_range = st.radio(
         "Select Age Range to Visualise",
-        [
-            "MF50-84",
-            "F50-84",
-            "M50-84",
-        ],
+        raw_options,
+        format_func=lambda x: alias_dict.get(x, x),
         index=0,
     )
     # Create choropleth
@@ -162,10 +166,17 @@ def render_demand_map():
             "labels": True,
             "sticky": False,
         },
+        name="Population",
+        zoom_start=9,
+        scheme="Percentiles",
     )
 
     # Add point layer
     m = add_sites_to_map(m, sites_gdf=sites_gdf)
     m = add_site_legend(m)
+    for child in m._children.values():
+        if child == "color_scale" or hasattr(child, "caption"):
+            # Default is usually ~450px. Let's make it thinner/wider:
+            child.width = 800
 
     st_folium(m, use_container_width=True)

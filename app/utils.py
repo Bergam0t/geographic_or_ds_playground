@@ -3,11 +3,15 @@ import streamlit as st
 import geopandas
 import html
 from app.utils_investigations import ALL_INVESTIGATIONS, Investigation
+import base64
+from PIL import Image
+from io import BytesIO
+from pathlib import Path
+import os
 
 TERMINAL_DEFAULT_SPEED = 10
 TERMINAL_COLOUR = "yellow"
-DECISION_COST = 25
-ANALYST_CAPACITY_INITIAL = 100
+MAXIMUM_BRIEFINGS = 5
 
 
 # Load datasets
@@ -114,6 +118,98 @@ def write_terminal_html(
         f.write(html_content)
 
     return len(text), reveal_speed_ms
+
+
+def write_crt_html(
+    image_path: str,
+    output_path: str = "app/assets/crt_render.html",
+    curvature: float = 0.15,
+    scanlines: float = 0.3,
+    vignette: float = 0.2,
+):
+    """
+    Writes a self-contained HTML file applying CRTFilter.js to a target image,
+    matching the architecture of your working terminal generator.
+    """
+    # 1. Read the local JavaScript file source
+    # (Using utf-8 to ensure smooth reading across different OS environments)
+    with open("app/assets/CRTFilter.js", "r", encoding="utf-8") as f:
+        js_library = f.read()
+
+    # 2. Convert the image asset to a base64 string
+    image = Image.open(image_path)
+    buffered = BytesIO()
+    image.save(buffered, format="PNG")
+    image_b64 = base64.b64encode(buffered.getvalue()).decode()
+
+    # 3. Generate the self-contained HTML
+    # Note: We use type="module" so the browser handles the library's ES exports flawlessly.
+    html_content = f"""<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {{
+            margin: 0;
+            padding: 0;
+            background-color: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }}
+        canvas {{
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }}
+    </style>
+</head>
+<body>
+
+    <canvas id="crtCanvas"></canvas>
+
+    <script type="module">
+        // Inject the library directly into the module scope
+        {js_library}
+
+        // The library exports 'CRTFilterWebGL' natively. 
+        // Because we are inside a type="module" script, it is perfectly accessible here.
+        const canvas = document.getElementById('crtCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const img = new Image();
+        img.src = "data:image/png;base64,{image_b64}";
+        
+        img.onload = function() {{
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+
+            try {{
+                // Initialize using the actual configuration keys required by the library
+                const crt = new CRTFilterWebGL(canvas, {{
+                    curvature: {curvature},
+                    scanlineIntensity: {scanlines},
+                    vignette: {vignette}
+                }});
+                
+                // Fire up the animation frame render cycle
+                crt.start();
+            }} catch (e) {{
+                console.error("CRTFilter runtime exception:", e);
+            }}
+        }};
+    </script>
+</body>
+</html>"""
+
+    # 4. Write out the static HTML file
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(html_content)
+
+    return output_path
 
 
 def record_page_visited(investigation: Investigation) -> None:
@@ -227,3 +323,115 @@ def render_navigation(current: Investigation) -> None:
         st.subheader("Other available investigations")
         for inv in other_investigations:
             investigation_button(inv)
+
+
+def crt_filter_component(
+    image_path: str, curvature: float, scanlines: float, vignette: float
+):
+    # 1. Prepare and read the Image
+    image = Image.open(image_path)
+    buffered = BytesIO()
+    image.save(buffered, format="PNG")
+    image_b64 = base64.b64encode(buffered.getvalue()).decode()
+
+    # 2. Read and patch the JS library
+    try:
+        js_lib_code = Path("app/assets/CRTFilter.js").read_text()
+
+        # REMOVE the ES Module export syntax so the browser can run it as a normal script
+        # This binds it to the global window scope safely inside our IIFE
+        js_lib_code = js_lib_code.replace("export { CRTFilterWebGL };", "")
+        js_lib_code = js_lib_code.replace("export default CRTFilterWebGL;", "")
+    except FileNotFoundError:
+        st.error("Could not find CRTFilter.js in app/assets/")
+        return
+
+    # Use a unique ID based on the path
+    canvas_id = f"crt_{hash(image_path) & 0xFFFFFFFF}"
+
+    html_code = f"""
+    <div style="display: flex; justify-content: center; margin: 10px 0;">
+        <canvas id="{canvas_id}" style="max-width: 100%; height: auto; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.4);"></canvas>
+    </div>
+
+    <script>
+        (function() {{
+            // 1. Evaluate the modified library string safely
+            if (typeof CRTFilterWebGL === 'undefined') {{
+                {js_lib_code}
+            }}
+
+            const canvas = document.getElementById('{canvas_id}');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            img.src = "data:image/png;base64,{image_b64}";
+            
+            img.onload = function() {{
+                // Apply source sizing
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+
+                try {{
+                    // 2. Instantiate with the correct class name and parameters
+                    const crt = new CRTFilterWebGL(canvas, {{
+                        curvature: {curvature},
+                        scanlineIntensity: {scanlines},
+                        vignette: {vignette}
+                    }});
+                    
+                    # 3. Trigger the animation loop render lifecycle
+                    crt.start();
+                }} catch (e) {{
+                    console.error("CRTFilter Execution Failure:", e);
+                }}
+            }};
+        }})();
+    </script>
+    """
+
+    st.html(html_code, unsafe_allow_javascript=True)
+
+
+ANALYST_CAPACITY_MESSAGES = [
+    {
+        "analyses_remaining": 5,
+        "message": (
+            "Your analyst appears enthusiastic and optimistic. "
+            "They have several coloured pens, a fresh notebook, and "
+            "a coffee cup that is still warm."
+        ),
+    },
+    {
+        "analyses_remaining": 4,
+        "message": "Your analyst appears a little less bright-eyed and bushy-tailed than when you"
+        "first met them. Their coffee cup does not leave their sight.",
+    },
+    {
+        "analyses_remaining": 3,
+        "message": "Your analyst appears to be disillusioned. They have been getting very angry about "
+        "documentation (the lack of it) and data dictionaries (the absence of them) and something "
+        "called a syntax error (an abundance of). You smile and nod politely.",
+    },
+    {
+        "analyses_remaining": 2,
+        "message": "Your analyst is mysteriously missing every time you try to talk to them. "
+        "You swear you saw them exit via a ground-floor bathroom window when you approached "
+        "the building recently, but you cannot prove this.",
+    },
+    {
+        "analyses_remaining": 1,
+        "message": "Your analyst informs you that they are considering a career in "
+        "sheep farming. They have begun browsing rural property listings "
+        "in Scotland during meetings. It may be prudent to reach a decision soon.",
+    },
+]
+
+
+def page_styling():
+    with open("app/style.css", "r") as f:
+        css_content = f.read()
+
+    return st.markdown(f"<style>{css_content}</style>", unsafe_allow_html=True)
