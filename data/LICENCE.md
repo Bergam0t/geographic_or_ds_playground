@@ -17,7 +17,11 @@ Used to generate demand_MF_50_84.csv
 
 ---
 
-Travel matrices generated using r5py.
+LSOA_PopCentroids_EW_2021_V4_-4541397882496207062.gpkg: Open Government Licences 3.0 (https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/)
+
+---
+
+Travel matrices generated using valhalla (car) and r5py (public transport).
 
 osm.pbf files obtained from Geofabrik (https://download.geofabrik.de/europe/united-kingdom/england/devon.html): Open Data Commons Open Database License (ODbL) - https://opendatacommons.org/licenses/odbl/
 
