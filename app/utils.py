@@ -8,6 +8,7 @@ from PIL import Image
 from io import BytesIO
 from pathlib import Path
 import os
+from lokigi.site import SiteProblem
 
 TERMINAL_DEFAULT_SPEED = 10
 TERMINAL_COLOUR = "yellow"
@@ -173,14 +174,14 @@ def write_crt_html(
         // Inject the library directly into the module scope
         {js_library}
 
-        // The library exports 'CRTFilterWebGL' natively. 
+        // The library exports 'CRTFilterWebGL' natively.
         // Because we are inside a type="module" script, it is perfectly accessible here.
         const canvas = document.getElementById('crtCanvas');
         const ctx = canvas.getContext('2d');
-        
+
         const img = new Image();
         img.src = "data:image/png;base64,{image_b64}";
-        
+
         img.onload = function() {{
             canvas.width = img.width;
             canvas.height = img.height;
@@ -193,7 +194,7 @@ def write_crt_html(
                     scanlineIntensity: {scanlines},
                     vignette: {vignette}
                 }});
-                
+
                 // Fire up the animation frame render cycle
                 crt.start();
             }} catch (e) {{
@@ -251,17 +252,19 @@ def investigation_button(investigation: Investigation) -> None:
     visited = _already_visited(investigation)
     button_key = f"inv_btn_{investigation.id}"
 
-    # Lucide icon via CDN — swap icon name to any at lucide.dev/icons
-    icon_html = f"""
-        <script src="https://unpkg.com/lucide@latest"></script>
-        <i data-lucide="{investigation.icon}"
-           style="width:18px;height:18px;stroke-width:1.75;vertical-align:middle;
-                  margin-right:8px;{"opacity:0.4;" if visited else ""}">
-        </i>
-        <script>lucide.createIcons();</script>
-    """
+    # # Use Iconify API to grab the Lucide icon as a clean, static SVG image
+    # # Lucide icons on Iconify use the prefix "lucide" (e.g., lucide/search)
+    # icon_url = f"https://api.iconify.design/lucide/{investigation.icon}.svg"
+
+    # icon_html = f"""
+    #     <img src="{icon_url}"
+    #          style="width:18px; height:18px; vertical-align:middle; margin-right:8px;
+    #                 {"filter: opacity(0.4) grayscale(100%);" if visited else ""}" />
+    # """
 
     if visited:
+        icon_url = f"https://api.iconify.design/lucide/{investigation.icon}.svg"
+        icon_html = f'<img src="{icon_url}" style="width:18px; height:18px; vertical-align:middle; margin-right:8px; filter: opacity(0.4) grayscale(100%);" />'
         # Render as static greyed-out tile — no button interaction
         st.html(f"""
             <div style="
@@ -282,18 +285,16 @@ def investigation_button(investigation: Investigation) -> None:
             </div>
         """)
     else:
-        # Use a real Streamlit button for click handling
-        col_icon, col_text = st.columns([0.08, 0.92])
-        with col_icon:
-            st.html(icon_html)
-        with col_text:
-            if st.button(
-                investigation.analyst_prompt,
-                key=button_key,
-                use_container_width=True,
-            ):
-                record_page_visited(investigation)
-                st.switch_page(investigation.page)
+        streamlit_icon = f":material/{investigation.icon}:"
+
+        if st.button(
+            investigation.analyst_prompt,
+            key=button_key,
+            icon=streamlit_icon,
+            use_container_width=True,
+        ):
+            record_page_visited(investigation)
+            st.switch_page(investigation.page)
 
 
 # components/investigation_button.py (addition)
@@ -363,11 +364,11 @@ def crt_filter_component(
 
             const canvas = document.getElementById('{canvas_id}');
             if (!canvas) return;
-            
+
             const ctx = canvas.getContext('2d');
             const img = new Image();
             img.src = "data:image/png;base64,{image_b64}";
-            
+
             img.onload = function() {{
                 // Apply source sizing
                 canvas.width = img.width;
@@ -381,7 +382,7 @@ def crt_filter_component(
                         scanlineIntensity: {scanlines},
                         vignette: {vignette}
                     }});
-                    
+
                     # 3. Trigger the animation loop render lifecycle
                     crt.start();
                 }} catch (e) {{
@@ -435,3 +436,102 @@ def page_styling():
         css_content = f.read()
 
     return st.markdown(f"<style>{css_content}</style>", unsafe_allow_html=True)
+
+
+def select_site_from_current_evidence():
+
+    devon_sites = load_devon_sites()
+    options = devon_sites[devon_sites["Existing"] == "No"]
+
+    selected = st.pills(
+        label="Based on the evidence on this page only, what one site would you choose?",
+        options=options,
+    )
+
+    return selected
+
+
+@st.cache_data
+def load_car_travel_matrix():
+    return pd.read_csv("data/travel_matrix_car.csv").fillna(9999.0)
+
+
+@st.cache_data
+def load_pt_travel_matrix():
+    return pd.read_csv("data/travel_matrix_public_transport.csv")
+
+
+@st.cache_resource
+def setup_lokigi_site_problem_BASE():
+    lokigi_site_problem = SiteProblem()
+
+    lokigi_site_problem.add_demand(
+        load_demand(), demand_col="MF50-84", location_id_col="LSOA 2021 Name"
+    )
+
+    lokigi_site_problem.add_region_geometry_layer(
+        load_devon_geography(), common_col="LSOA21NM"
+    )
+
+    # lokigi_site_problem.add_equity_data(
+    #     load_deprivation(),
+    #     equity_col="Index of Multiple Deprivation (IMD) Decile (where 1 is most deprived 10% of LSOA",
+    #     common_col="LSOA name (2021)",
+    #     label="IMD",
+    # )
+
+    return lokigi_site_problem
+
+
+@st.cache_resource
+def setup_lokigi_site_problem_car_existing():
+    lokigi_site_problem = setup_lokigi_site_problem_BASE().copy()
+
+    devon_sites = load_devon_sites()
+
+    devon_sites = devon_sites[devon_sites["Existing"] == "Yes"]
+
+    lokigi_site_problem.add_sites(
+        devon_sites,
+        candidate_id_col="Facility_Name",
+    )
+
+    lokigi_site_problem.add_travel_matrix(
+        load_car_travel_matrix(), unit="minutes", source_col="from_id"
+    )
+
+    return lokigi_site_problem
+
+
+@st.cache_resource
+def setup_lokigi_site_problem_car():
+    lokigi_site_problem = setup_lokigi_site_problem_BASE().copy()
+
+    lokigi_site_problem.add_sites(
+        load_devon_sites(),
+        candidate_id_col="Facility_Name",
+        required_sites_col="Existing",
+    )
+
+    lokigi_site_problem.add_travel_matrix(
+        load_car_travel_matrix(), unit="minutes", source_col="from_id"
+    )
+
+    return lokigi_site_problem
+
+
+@st.cache_resource
+def setup_lokigi_site_problem_pt():
+    lokigi_site_problem = setup_lokigi_site_problem_BASE().copy()
+
+    lokigi_site_problem.add_sites(
+        load_devon_sites(),
+        candidate_id_col="Facility_Name",
+        required_sites_col="Existing",
+    )
+
+    lokigi_site_problem.add_travel_matrix(
+        load_pt_travel_matrix(), unit="minutes", source_col="from_id"
+    )
+
+    return lokigi_site_problem

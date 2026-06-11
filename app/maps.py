@@ -131,7 +131,6 @@ def render_deprivation_map():
     st_folium(m, use_container_width=True)
 
 
-@st.fragment
 def render_demand_map():
     demand_gdf = create_demand_gdf()
     sites_gdf = load_devon_sites()
@@ -179,4 +178,38 @@ def render_demand_map():
             # Default is usually ~450px. Let's make it thinner/wider:
             child.width = 800
 
-    st_folium(m, use_container_width=True)
+    return st_folium(m, use_container_width=True)
+
+
+@st.fragment
+def render_travel_existing_map(best_solution_gdf):
+
+    sites_gdf = load_devon_sites()
+
+    m = best_solution_gdf.explore(
+        column="min_cost",
+        tooltip=[
+            "LSOA21NM",
+            "min_cost",
+        ],
+        tooltip_kwds={
+            "aliases": [
+                "Area:",
+                "Travel time to nearest site (minutes):",
+            ],
+            "labels": True,
+            "sticky": False,
+        },
+        name="Travel Time (Minutes)",
+        zoom_start=9,
+    )
+
+    # Add point layer
+    m = add_sites_to_map(m, sites_gdf=sites_gdf)
+    m = add_site_legend(m)
+    for child in m._children.values():
+        if child == "color_scale" or hasattr(child, "caption"):
+            # Default is usually ~450px. Let's make it thinner/wider:
+            child.width = 800
+
+    return st_folium(m, use_container_width=True)

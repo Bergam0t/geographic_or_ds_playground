@@ -15,5 +15,7 @@ data/File_1_IoD2025_Index_of_Multiple_Deprivation.xlsx
 data/sapelsoasyoa20222024.xlsx
 
 app/assets/terminal_working/*.html
+app/assets/crt_working/*.html
 
 .vscode/
+data/travel_matrix_generation/valhalla

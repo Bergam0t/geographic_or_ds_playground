@@ -14,17 +14,6 @@ from num2words import num2words
 st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
 page_styling()
 
-st.markdown(
-    """
-<style>
-    [data-testid="collapsedControl"] {
-        display: none
-    }
-</style>
-""",
-    unsafe_allow_html=True,
-)
-
 st.title("Welcome")
 
 cola, colb = st.columns([0.7, 0.3])
@@ -42,7 +31,7 @@ intro_text = f"""
 <br><br>
 > The frazzled-looking data team lead has assured you it will be plenty.
 <br><br>
-> What would you like your first briefing to be on?
+> What is your first request to your data analyst?
 """
 
 if not st.session_state.homepage_visited:

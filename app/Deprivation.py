@@ -1,10 +1,10 @@
 import streamlit as st
-from app.utils import write_terminal_html
-from app.utils import render_navigation
+from app.utils import write_terminal_html, render_navigation, page_styling
 from app.utils_investigations import DEPRIVATION
 from app.maps import render_deprivation_map
 
 st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
+page_styling()
 
 st.markdown(
     """

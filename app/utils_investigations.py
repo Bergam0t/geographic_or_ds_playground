@@ -18,7 +18,7 @@ class Investigation:
     is_entry_point: bool
 
     analyst_days: float
-    icon: str = "map-pin"
+    icon: str = "arrow_forward"
 
 
 DEMAND = Investigation(
@@ -33,9 +33,10 @@ DEMAND = Investigation(
         "hotspots_demand",
         "travel_car",
     ],
-    analyst_prompt=("Map the population aged 50-85 who may require CDC services."),
+    analyst_prompt=("Show me the population aged 50-85 who may require CDC services."),
     is_entry_point=True,
     analyst_days=0.5,
+    icon="groups_2",
 )
 
 DEPRIVATION = Investigation(
@@ -54,6 +55,7 @@ DEPRIVATION = Investigation(
     analyst_prompt=("Show me areas experiencing the highest deprivation."),
     is_entry_point=True,
     analyst_days=0.5,
+    icon="payment_arrow_down",
 )
 
 TRAVEL_CAR = Investigation(
@@ -64,9 +66,10 @@ TRAVEL_CAR = Investigation(
     prerequisites=[],
     parent=None,
     recommended_next=["travel_pt", "isochrones_car", "demand"],
-    analyst_prompt=("Show travel times to existing CDCs."),
+    analyst_prompt=("Show me travel times to existing CDCs."),
     is_entry_point=True,
     analyst_days=3,
+    icon="directions_car",
 )
 
 TRAVEL_PT = Investigation(

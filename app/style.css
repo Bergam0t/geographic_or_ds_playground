@@ -1,6 +1,11 @@
+/* Hide sidebar expansion control */
+[data-testid="stExpandSidebarButton"] {
+    display: none
+}
+
 /* Remove blank space at top and bottom */
 .block-container {
-    padding-top: 0rem;
+    padding-top: 1rem;
     padding-bottom: 0rem;
 }
 
@@ -20,4 +25,19 @@
     pointer-events: auto;
     background: rgb(255 255 255);
     border-radius: 5px;
+}
+
+span[data-testid="stIconMaterial"] {
+    font-size: 24px !important;
+    /* Increase icon size (default is usually ~1rem) */
+    width: 24px !important;
+    height: 24px !important;
+}
+
+/* Adjust the button's internal spacing to balance the larger icon */
+div[data-testid="stButton"] button {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    /* Adds breathing room between the larger icon and text */
 }
