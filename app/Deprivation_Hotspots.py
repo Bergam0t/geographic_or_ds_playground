@@ -1,20 +1,10 @@
 import streamlit as st
-from app.utils import render_navigation
+from app.utils import render_navigation, page_styling
 from app.utils_investigations import HOTSPOTS_DEPRIVATION
 
 
 st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
-
-st.markdown(
-    """
-<style>
-    [data-testid="collapsedControl"] {
-        display: none
-    }
-</style>
-""",
-    unsafe_allow_html=True,
-)
+page_styling()
 
 st.title("Demand and Deprivation Hotspots")
 

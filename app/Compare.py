@@ -1,16 +1,7 @@
 import streamlit as st
+from app.utils import page_styling
 
 st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
-
-st.markdown(
-    """
-<style>
-    [data-testid="collapsedControl"] {
-        display: none
-    }
-</style>
-""",
-    unsafe_allow_html=True,
-)
+page_styling()
 
 st.title("Compare")

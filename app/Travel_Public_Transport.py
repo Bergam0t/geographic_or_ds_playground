@@ -3,23 +3,14 @@ from app.utils import (
     render_navigation,
     load_devon_geography,
     setup_lokigi_site_problem_pt,
+    page_styling,
 )
 from app.utils_investigations import TRAVEL_PT
 from app.maps import render_travel_maps
 
 
 st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
-
-st.markdown(
-    """
-<style>
-    [data-testid="collapsedControl"] {
-        display: none
-    }
-</style>
-""",
-    unsafe_allow_html=True,
-)
+page_styling()
 
 st.title("Travel")
 

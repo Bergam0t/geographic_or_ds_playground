@@ -1,9 +1,10 @@
 import streamlit as st
-from app.utils import render_navigation
+from app.utils import render_navigation, page_styling
 from app.utils_investigations import HOTSPOTS_DEMAND
 
 
 st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
+page_styling()
 
 st.markdown(
     """

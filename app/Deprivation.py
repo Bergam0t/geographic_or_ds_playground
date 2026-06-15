@@ -6,16 +6,6 @@ from app.maps import render_deprivation_map
 st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
 page_styling()
 
-st.markdown(
-    """
-<style>
-    [data-testid="collapsedControl"] {
-        display: none
-    }
-</style>
-""",
-    unsafe_allow_html=True,
-)
 
 st.title("Deprivation")
 
