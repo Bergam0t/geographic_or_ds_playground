@@ -4,26 +4,16 @@ from app.utils import (
     setup_lokigi_site_problem_car_existing,
     page_styling,
     load_devon_geography,
+    load_population_weighted_centroids,
 )
 from app.utils_investigations import TRAVEL_CAR
-from app.maps import render_travel_existing_map
+from app.maps import render_travel_maps
 
 st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
 page_styling()
 
-st.markdown(
-    """
-<style>
-    [data-testid="collapsedControl"] {
-        display: none
-    }
-</style>
-""",
-    unsafe_allow_html=True,
-)
 
-
-st.title("Travel")
+st.title("Travel by Public Transport")
 
 problem = setup_lokigi_site_problem_car_existing()
 
@@ -33,13 +23,16 @@ best_solution_df = solution.return_best_combination_details()["problem_df"].iloc
 
 
 region_geometry = load_devon_geography()
+pwc = load_population_weighted_centroids(snapped=True)
 
-st.write(best_solution_df)
+# st.write(best_solution_df)
+
 
 best_solution_gdf = region_geometry.merge(
     best_solution_df, left_on="LSOA21NM", right_on="LSOA 2021 Name"
 )
 
-render_travel_existing_map(best_solution_gdf)
+
+render_travel_maps(best_solution_gdf)
 
 render_navigation(TRAVEL_CAR)

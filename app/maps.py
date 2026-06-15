@@ -1,10 +1,19 @@
-from app.utils import create_demand_gdf, create_deprivation_gdf, load_devon_sites
+from app.utils import (
+    create_demand_gdf,
+    create_deprivation_gdf,
+    load_devon_sites,
+    load_population_weighted_centroids,
+)
 import streamlit as st
 import folium
 from streamlit_folium import st_folium
+import pandas as pd
 
 
-def add_sites_to_map(m, sites_gdf):
+###########################
+# MARK: Helpers
+###########################
+def add_sites_to_map(m, sites_gdf, add_centroids=False, centroid_gdf=None):
     existing_sites = sites_gdf[sites_gdf["Existing"] == "Yes"]
     proposed_sites = sites_gdf[sites_gdf["Existing"] == "No"]
 
@@ -37,6 +46,17 @@ def add_sites_to_map(m, sites_gdf):
 
     existing_group.add_to(m)
     proposed_group.add_to(m)
+
+    if add_centroids:
+        centroids = folium.FeatureGroup(name="Centroids")
+        centroid_gdf = centroid_gdf.to_crs("EPSG:4326")
+
+        for _, row in centroid_gdf.iterrows():
+            folium.CircleMarker(
+                location=[row.geometry.y, row.geometry.x], color="white", radius=3
+            ).add_to(centroids)
+
+        centroids.add_to(m)
 
     folium.LayerControl(collapsed=False).add_to(m)
 
@@ -81,6 +101,9 @@ def add_site_legend(m):
     return m
 
 
+###########################
+# MARK: Deprivation
+###########################
 @st.fragment
 def render_deprivation_map():
     deprivation_gdf = create_deprivation_gdf()
@@ -131,6 +154,9 @@ def render_deprivation_map():
     st_folium(m, use_container_width=True)
 
 
+###########################
+# MARK: Demand
+###########################
 def render_demand_map():
     demand_gdf = create_demand_gdf()
     sites_gdf = load_devon_sites()
@@ -181,31 +207,92 @@ def render_demand_map():
     return st_folium(m, use_container_width=True)
 
 
-@st.fragment
-def render_travel_existing_map(best_solution_gdf):
+###########################
+# MARK: Travel
+###########################
+def render_travel_existing_map(best_solution_gdf, what, threshold=None):
 
     sites_gdf = load_devon_sites()
 
-    m = best_solution_gdf.explore(
-        column="min_cost",
-        tooltip=[
-            "LSOA21NM",
-            "min_cost",
-        ],
+    centroids = load_population_weighted_centroids()
+
+    if what == "time":
+        column = "min_cost"
+        name = "Travel Time (Minutes)"
+        legend_kwds = {"caption": "Travel Time (Minutes)"}
+        cmap = None
+    elif what == "centre":
+        column = "selected_site"
+        name = "Nearest Site"
+        legend_kwds = {"caption": "Nearest Site to LSOA"}
+        cmap = None
+    if what == "threshold":
+        if threshold is None:
+            raise ValueError("No threshold defined")
+        else:
+            best_solution_gdf["exceeds_threshold"] = (
+                best_solution_gdf["min_cost"] > threshold
+            ).map({True: "Yes", False: "No"})
+
+            best_solution_gdf["exceeds_threshold"] = pd.Categorical(
+                best_solution_gdf["exceeds_threshold"],
+                categories=["No", "Yes"],
+                ordered=True,
+            )
+            column = "exceeds_threshold"
+            name = "Exceeds threshold time"
+            legend_kwds = {"caption": f"Exceeds travel time of {threshold} minutes"}
+            cmap = {
+                "Yes": "#ef8a62",  # soft red/orange
+                "No": "#67a9cf",  # soft blue
+            }
+
+            from matplotlib.colors import ListedColormap
+
+            cmap = ListedColormap(["#67a9cf", "#ef8a62"])
+
+    m = best_solution_gdf.round(1).explore(
+        column=column,
+        tooltip=["LSOA21NM", "min_cost", "selected_site"],
         tooltip_kwds={
             "aliases": [
                 "Area:",
                 "Travel time to nearest site (minutes):",
+                "Nearest site:",
             ],
             "labels": True,
             "sticky": False,
         },
-        name="Travel Time (Minutes)",
+        name=name,
         zoom_start=9,
+        legend_kwds=legend_kwds,
+        cmap=cmap,
     )
 
+    if what == "centre" or what == "threshold":
+        # Workaround for legend colours
+        m.get_root().header.add_child(
+            folium.Element("""
+            <style>
+            .legend-labels {
+                color: black !important;
+            }
+
+            .legend-title {
+                color: black !important;
+            }
+            </style>
+            """)
+        )
+
     # Add point layer
-    m = add_sites_to_map(m, sites_gdf=sites_gdf)
+    m = add_sites_to_map(
+        m,
+        sites_gdf=sites_gdf,
+        # Can turn centroids back on for debugging purposes if needed
+        centroid_gdf=centroids,
+        add_centroids=False,
+    )
     m = add_site_legend(m)
     for child in m._children.values():
         if child == "color_scale" or hasattr(child, "caption"):
@@ -213,3 +300,31 @@ def render_travel_existing_map(best_solution_gdf):
             child.width = 800
 
     return st_folium(m, use_container_width=True)
+
+
+@st.fragment
+def render_travel_maps(best_solution_gdf):
+    map_selection = st.radio(
+        "Select map type",
+        [
+            "Show travel time",
+            "Show nearest centre",
+            "Show regions exceeding a certain travel time",
+        ],
+    )
+
+    if map_selection == "Show travel time":
+        render_travel_existing_map(best_solution_gdf, what="time")
+    elif map_selection == "Show nearest centre":
+        render_travel_existing_map(best_solution_gdf, what="centre")
+    elif map_selection == "Show regions exceeding a certain travel time":
+        threshold = st.slider(
+            label="Choose a maximum travel time",
+            min_value=15,
+            max_value=60,
+            value=45,
+            step=5,
+        )
+        render_travel_existing_map(
+            best_solution_gdf, what="threshold", threshold=threshold
+        )

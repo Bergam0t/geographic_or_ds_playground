@@ -27,6 +27,16 @@ def load_travel_matrix_public():
 
 
 @st.cache_data
+def load_population_weighted_centroids(snapped=True):
+    if snapped:
+        return geopandas.read_file("data/travel_matrix_generation/snapped_pwc.gpkg")
+    else:
+        return geopandas.read_file(
+            "data/travel_matrix_generation/LSOA_PopCentroids_EW_2021_V4_-4541397882496207062.gpkg"
+        )
+
+
+@st.cache_data
 def load_devon_sites():
     existing_cdcs = pd.read_csv("data/devon_cdcs.csv")
     return geopandas.GeoDataFrame(

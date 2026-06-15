@@ -5,7 +5,7 @@ from app.utils import (
     setup_lokigi_site_problem_pt,
 )
 from app.utils_investigations import TRAVEL_PT
-from app.maps import render_travel_existing_map
+from app.maps import render_travel_maps
 
 
 st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
@@ -37,7 +37,7 @@ best_solution_gdf = region_geometry.merge(
     best_solution_df, left_on="LSOA21NM", right_on="LSOA 2021 Name"
 )
 
-render_travel_existing_map(best_solution_gdf)
+render_travel_maps(best_solution_gdf)
 
 
 render_navigation(TRAVEL_PT)
