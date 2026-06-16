@@ -82,7 +82,7 @@ pg = st.navigation(
         # This page will also have a summary of all of the information they have uniquely collected.
         st.Page("app/Decide.py", title="What's your Decision?"),
         # Next, we go to the optimization page.
-        st.Page("app/Optimize.py", title="What does the maths say?"),
+        st.Page("app/Optimise_5_Sites.py", title="What does the maths say?"),
         # We can compare both their solution and the optimized solution against the existing solution to show
         # the benefits and who they affect
         st.Page("app/Compare.py", title="What's the payoff?"),

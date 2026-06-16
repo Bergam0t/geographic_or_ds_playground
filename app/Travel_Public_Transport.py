@@ -12,7 +12,7 @@ from app.maps import render_travel_maps
 st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
 page_styling()
 
-st.title("Travel")
+st.title("Travel Time - by Public Transport")
 
 problem = setup_lokigi_site_problem_pt()
 
