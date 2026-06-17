@@ -327,3 +327,66 @@ def render_travel_maps(best_solution_gdf):
         return render_travel_existing_map(
             best_solution_gdf, what="threshold", threshold=threshold
         )
+
+
+def make_selection_map(map_render_fn, key_suffix):
+    @st.fragment
+    def selection_map():
+        st_data = map_render_fn()
+
+        st.write("From just the evidence on this page, which site would you choose?")
+
+        all_sites = load_devon_sites()
+        existing_sites = all_sites[all_sites["Existing"] == "Yes"][
+            "Facility_Name"
+        ].to_list()
+
+        selected_site = st_data["last_object_clicked_popup"]
+
+        confirmed_key = f"confirmed_site_{key_suffix}"
+        submitted_key = f"site_submitted_{key_suffix}"
+
+        if selected_site is None:
+            st.warning(
+                "Click on a blue candidate site on the map above to make your selection."
+            )
+            # Reset confirmation if no site is selected
+            st.session_state[confirmed_key] = None
+        elif st.session_state[submitted_key]:
+            st.info(
+                f"You have submitted a site recommendation based on {key_suffix} "
+                f"({st.session_state[confirmed_key]['Site']})."
+                "\n\nPlease use the buttons below to request your next analysis."
+            )
+        elif selected_site in existing_sites:
+            st.error(
+                "Cannot select an existing site. Please click on a proposed site (the blue markers)."
+            )
+            st.session_state[confirmed_key] = None
+        else:
+            st.success(f"Selected Site = {selected_site}")
+            st.session_state[confirmed_key] = {
+                "What": key_suffix.capitalize(),
+                "Site": selected_site,
+            }
+
+        button = st.button(
+            "Click here to confirm your site choice",
+            disabled=True
+            if (
+                st.session_state[confirmed_key] is None
+                or st.session_state[submitted_key]
+            )
+            else False,
+            key=f"confirm_button_{key_suffix}",
+        )
+
+        if not button:
+            st.write("")
+            st.write("")
+
+        if button:
+            st.session_state[submitted_key] = True
+            st.rerun()
+
+    return selection_map

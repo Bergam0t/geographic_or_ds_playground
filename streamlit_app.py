@@ -33,7 +33,13 @@ if "observed_one_accessibility_page" not in st.session_state:
 
 
 # Set up session keys relating to site submissions
-site_selection_submittable = ["demand", "deprivation", "travel_car"]
+site_selection_submittable = [
+    "demand",
+    "deprivation",
+    "car_travel",
+    "public_transport",
+    "utilisation",
+]
 
 for i in site_selection_submittable:
     if f"confirmed_site_{i}" not in st.session_state:

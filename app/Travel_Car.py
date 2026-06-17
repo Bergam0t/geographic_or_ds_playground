@@ -9,8 +9,9 @@ from app.utils import (
     write_terminal_html,
 )
 from app.utils_investigations import TRAVEL_CAR
-from app.maps import render_travel_maps
+from app.maps import render_travel_maps, make_selection_map
 import time
+from functools import partial
 
 st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
 page_styling()
@@ -56,53 +57,12 @@ st.iframe("app/assets/terminal_working/travel_car.html")
 typing_duration = (char_count * reveal_speed) / 1000
 time.sleep(typing_duration)
 
+# Note the session key doesn't follow the name of the page as the automated rules would
+# make it display weirdly
+car_travel_selection_map = make_selection_map(
+    partial(render_travel_maps, best_solution_gdf), "car_travel"
+)
+car_travel_selection_map()
 
-@st.fragment
-def selection_map():
-    st_data = render_travel_maps(best_solution_gdf)
-
-    st.write("From just the evidence on this page, which site would you choose?")
-
-    selected_site = st_data["last_object_clicked_popup"]
-
-    if selected_site is None:
-        st.warning(
-            "Click on a blue candidate site on the map above to make your selection."
-        )
-        # Reset confirmation if no site is selected
-        st.session_state.confirmed_site_travel_car = None
-    elif st.session_state.site_submitted_travel_car:
-        st.info(
-            f"You have already submitted a site recommendation based on car travel times ({st.session_state.confirmed_site_travel_car['Site']})."
-            "\n\nPlease use the buttons below to request your next analysis."
-        )
-    else:
-        st.success(f"Selected Site = {selected_site}")
-        st.session_state.confirmed_site_travel_car = {
-            "What": "Car Travel",
-            "Site": selected_site,
-        }
-
-    button = st.button(
-        "Click here to confirm your site choice",
-        disabled=True
-        if (
-            st.session_state.confirmed_site_travel_car is None
-            or st.session_state.site_submitted_travel_car
-        )
-        else False,
-    )
-
-    if not button:
-        st.write("")
-        st.write("")
-
-    if button:
-        st.session_state.site_submitted_travel_car = True
-        st.rerun()
-
-
-selection_map()
-
-if st.session_state.site_submitted_travel_car:
+if st.session_state.site_submitted_car_travel:
     render_navigation(TRAVEL_CAR)
