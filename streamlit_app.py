@@ -31,6 +31,17 @@ if "observed_one_demand_page" not in st.session_state:
 if "observed_one_accessibility_page" not in st.session_state:
     st.session_state.observed_one_accessibility_page = False
 
+
+# Set up session keys relating to site submissions
+site_selection_submittable = ["demand", "deprivation", "travel_car"]
+
+for i in site_selection_submittable:
+    if f"confirmed_site_{i}" not in st.session_state:
+        st.session_state[f"confirmed_site_{i}"] = None
+    if f"site_submitted_{i}" not in st.session_state:
+        st.session_state[f"site_submitted_{i}"] = False
+
+
 pg = st.navigation(
     [
         st.Page("app/Homepage.py", title="Welcome!"),

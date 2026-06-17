@@ -11,9 +11,6 @@ from app.maps import render_demand_map
 st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
 page_styling()
 
-if "site_submitted_demand" not in st.session_state:
-    st.session_state.site_submitted_demand = False
-
 st.title("Demand")
 
 intro_text = """
@@ -43,9 +40,6 @@ def selection_map():
     st.write("From just the evidence on this page, which site would you choose?")
 
     selected_site = st_data["last_object_clicked_popup"]
-
-    if "confirmed_site_demand" not in st.session_state:
-        st.session_state.confirmed_site_demand = None
 
     if selected_site is None:
         st.warning(

@@ -302,7 +302,6 @@ def render_travel_existing_map(best_solution_gdf, what, threshold=None):
     return st_folium(m, use_container_width=True)
 
 
-@st.fragment
 def render_travel_maps(best_solution_gdf):
     map_selection = st.radio(
         "Select map type",
@@ -314,9 +313,9 @@ def render_travel_maps(best_solution_gdf):
     )
 
     if map_selection == "Show travel time":
-        render_travel_existing_map(best_solution_gdf, what="time")
+        return render_travel_existing_map(best_solution_gdf, what="time")
     elif map_selection == "Show nearest centre":
-        render_travel_existing_map(best_solution_gdf, what="centre")
+        return render_travel_existing_map(best_solution_gdf, what="centre")
     elif map_selection == "Show regions exceeding a certain travel time":
         threshold = st.slider(
             label="Choose a maximum travel time",
@@ -325,6 +324,6 @@ def render_travel_maps(best_solution_gdf):
             value=45,
             step=5,
         )
-        render_travel_existing_map(
+        return render_travel_existing_map(
             best_solution_gdf, what="threshold", threshold=threshold
         )
