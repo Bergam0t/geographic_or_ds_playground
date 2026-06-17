@@ -343,7 +343,7 @@ def render_navigation(current: Investigation) -> None:
         icon=":material/contract:",
         use_container_width=True,
     ):
-        st.switch_page("Review.py")
+        st.switch_page("app/Review.py")
 
     if st.button(
         "Make your choice.",
@@ -351,7 +351,7 @@ def render_navigation(current: Investigation) -> None:
         icon=":material/balance:",
         use_container_width=True,
     ):
-        st.switch_page("Decide.py")
+        st.switch_page("app/Decide.py")
 
     # Padding
     st.write("")
