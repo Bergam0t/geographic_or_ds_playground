@@ -335,6 +335,28 @@ def render_navigation(current: Investigation) -> None:
         for inv in other_investigations:
             investigation_button(inv)
 
+    st.subheader("Other Actions")
+    # Allow jumping to decisions page
+    if st.button(
+        "Review your decisions so far.",
+        key="btn_review_decisions",
+        icon=":material/contract:",
+        use_container_width=True,
+    ):
+        st.switch_page("Review.py")
+
+    if st.button(
+        "Make your choice.",
+        key="btn_make_your_choice",
+        icon=":material/balance:",
+        use_container_width=True,
+    ):
+        st.switch_page("Decide.py")
+
+    # Padding
+    st.write("")
+    st.write("")
+
 
 def crt_filter_component(
     image_path: str, curvature: float, scanlines: float, vignette: float

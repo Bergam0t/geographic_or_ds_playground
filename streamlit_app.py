@@ -90,7 +90,7 @@ pg = st.navigation(
         st.Page("app/Catchment_2sfca_pt.py", title="Who is currently underserved?"),
         # This page will have a summary of all of the information they have uniquely collected.
         # Buttons will lead out to 'Collect More Evidence' or
-        st.Page("app/Running_Evidence_Summary.py", title="What do we know so far?"),
+        st.Page("app/Review.py", title="What do we know so far?"),
         # Explore the utilisation of existing CDCs (capacity vs catchment)
         st.Page("app/Utilisation.py", title="What's your Decision?"),
         # Display projected demand
