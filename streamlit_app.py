@@ -1,4 +1,5 @@
 import streamlit as st
+from app.utils import SITE_SELECTION_SUBMITTABLE
 
 states = [
     "catchment_page_visited",
@@ -33,15 +34,7 @@ if "observed_one_accessibility_page" not in st.session_state:
 
 
 # Set up session keys relating to site submissions
-site_selection_submittable = [
-    "demand",
-    "deprivation",
-    "car_travel",
-    "public_transport",
-    "utilisation",
-]
-
-for i in site_selection_submittable:
+for i in SITE_SELECTION_SUBMITTABLE:
     if f"confirmed_site_{i}" not in st.session_state:
         st.session_state[f"confirmed_site_{i}"] = None
     if f"site_submitted_{i}" not in st.session_state:
@@ -88,9 +81,6 @@ pg = st.navigation(
         st.Page("app/Catchment_2sfca_car.py", title="Who is currently underserved?"),
         # 2 step floating catchment area - again, what to do about car vs PT, and cross-border?
         st.Page("app/Catchment_2sfca_pt.py", title="Who is currently underserved?"),
-        # This page will have a summary of all of the information they have uniquely collected.
-        # Buttons will lead out to 'Collect More Evidence' or
-        st.Page("app/Review.py", title="What do we know so far?"),
         # Explore the utilisation of existing CDCs (capacity vs catchment)
         st.Page("app/Utilisation.py", title="What's your Decision?"),
         # Display projected demand
@@ -100,6 +90,7 @@ pg = st.navigation(
         st.Page("app/Decide.py", title="What's your Decision?"),
         # Next, we go to the optimization page.
         st.Page("app/Optimise_5_Sites.py", title="What does the maths say?"),
+        st.Page("app/Optimise_6_Sites.py", title="What does the maths say?"),
         # We can compare both their solution and the optimized solution against the existing solution to show
         # the benefits and who they affect
         st.Page("app/Compare.py", title="What's the payoff?"),

@@ -14,6 +14,14 @@ TERMINAL_DEFAULT_SPEED = 10
 TERMINAL_COLOUR = "yellow"
 MAXIMUM_BRIEFINGS = 5
 
+SITE_SELECTION_SUBMITTABLE = [
+    "demand",
+    "deprivation",
+    "car_travel",
+    "public_transport",
+    "utilisation",
+]
+
 
 # Load datasets
 @st.cache_data
@@ -338,15 +346,7 @@ def render_navigation(current: Investigation) -> None:
     st.subheader("Other Actions")
     # Allow jumping to decisions page
     if st.button(
-        "Review your decisions so far.",
-        key="btn_review_decisions",
-        icon=":material/contract:",
-        use_container_width=True,
-    ):
-        st.switch_page("app/Review.py")
-
-    if st.button(
-        "Make your choice.",
+        "Review your decisions so far and make your choice.",
         key="btn_make_your_choice",
         icon=":material/balance:",
         use_container_width=True,
@@ -567,3 +567,16 @@ def setup_lokigi_site_problem_pt():
     )
 
     return lokigi_site_problem
+
+
+def render_notes_textbox(key):
+    st.subheader("Write down any additional thoughts you have.")
+    st.caption("These will be saved to your notes.")
+    st.text_area(
+        label="Your Thoughts",
+        label_visibility="hidden",
+        key=f"additional_thoughts_{key}",
+    )
+
+    st.write("")
+    st.write("")

@@ -16,13 +16,13 @@ st.title("Demand")
 intro_text = """
 > Your analyst has delivered the following map.
 <br><br>
-> They tell you that you can hover over the red icons (the current CDCs) and the blue icons (the CDCs) to find out more.
+> They tell you that you can hover over the red icons (the current CDCs) and the blue icons (the blue CDCs) to find out more.
 <br><br>
-> They also tell you that you can hover over each region to see the exact count of people 50-84 in the region.
+> They also tell you that you can hover over each coloured region to see the exact count of people 50-84 in the region.
 <br><br>
-> They let you know that yellow is the highest demand, and purple means lower demand.
+> They let you know that yellow is the highest demand, and purple means lower demand. They mention that you can use the + and - buttons in the top left to zoom in and out.
 <br><br>
-> You can use the + and - buttons in the top left to zoom in and out.
+> They then become pixellated and return to the cloud until they are next required. You hope the map works.
 """
 
 char_count, reveal_speed = write_terminal_html(
