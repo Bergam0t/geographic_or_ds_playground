@@ -104,7 +104,6 @@ def add_site_legend(m):
 ###########################
 # MARK: Deprivation
 ###########################
-@st.fragment
 def render_deprivation_map():
     deprivation_gdf = create_deprivation_gdf()
     sites_gdf = load_devon_sites()
@@ -151,7 +150,7 @@ def render_deprivation_map():
     m = add_sites_to_map(m, sites_gdf=sites_gdf)
     m = add_site_legend(m)
 
-    st_folium(m, use_container_width=True)
+    return st_folium(m, use_container_width=True)
 
 
 ###########################

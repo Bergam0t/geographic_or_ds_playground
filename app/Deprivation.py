@@ -1,7 +1,12 @@
 import streamlit as st
-from app.utils import write_terminal_html, render_navigation, page_styling
+from app.utils import (
+    write_terminal_html,
+    render_navigation,
+    page_styling,
+    render_notes_textbox,
+)
 from app.utils_investigations import DEPRIVATION
-from app.maps import render_deprivation_map
+from app.maps import render_deprivation_map, make_selection_map
 
 st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
 page_styling()
@@ -36,18 +41,11 @@ else:
 
 st.iframe("app/assets/terminal_working/deprivation_page.html")
 
-render_deprivation_map()
+select_map = make_selection_map(render_deprivation_map, "deprivation")
+select_map()
 
 
-st.subheader("Interpretation")
-st.radio("Based on this map alone, where would you place the new centre?")
+render_notes_textbox(key="deprivation")
 
-st.radio("What is your most important takeaway from this map?")
-
-
-st.subheader("Write down any additional thoughts you have.")
-st.caption("These will be saved to your notes.")
-st.text_area(label="Your Thoughts", label_visibility="hidden")
-
-
-render_navigation(DEPRIVATION)
+if st.session_state.site_submitted_deprivation:
+    render_navigation(DEPRIVATION)
